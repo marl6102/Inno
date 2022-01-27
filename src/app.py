@@ -1,9 +1,10 @@
 import random
+from _NLP import CoreNLP
 from flask import Flask, request
 from pymessenger.bot import Bot
 
 app = Flask(__name__)
-ACCESS_TOKEN = 'EAAGBE6P3er0BAFIus6VqU8CcKmFt3THoeMr0ClgPPLVaE8ash0Fa1IoHZBZAVJZCZCr4ZB9tpRZB7Iwsnx1tRImIOWxypLxVmYBGwyM920jjZCEBoYvWWl4AHkgbxZAZCKcx4WGJWwTQwAlf9C15G15eGMER2p5ayUVzACO5ZCfwUDXPVZADm3WZCEtY'
+ACCESS_TOKEN = 'EAAGBE6P3er0BANk1ON8qJAdwWBBa0LiKHB092uephZB69r3hOuPtOfWJeZA7h7BVLMEKTmsnAegiuavPXP6G3Conr2xZCUIUF05SDLsRzwoSYhDNdJPK1ZBaDmWAZCwh7aKga8koMb7FPZCEwKyMEZB0eAEBWBrMwlhdI78yBMXkArynCvazzrW'
 VERIFY_TOKEN = 'Inno2022'
 bot = Bot(ACCESS_TOKEN)
 
@@ -24,15 +25,11 @@ def receive_message():
                 #Facebook Messenger ID for user so we know where to send response back to
                 recipient_id = message['sender']['id']
                 if message['message'].get('text'):
-                    print(message['message'].get('text'))
-                    response_sent_text = get_message()
-                    send_message(recipient_id, response_sent_text)
-                #if user sends us a GIF, photo,video, or any other non-text item
-                if message['message'].get('attachments'):
-                    
-                    response_sent_nontext = get_message()
-                    send_message(recipient_id, response_sent_nontext)
+                    user_message = message['message'].get('text')
+                    reply = _NLP.undertandMessage()
+                    send_message(recipient_id, reply)
     return "Message Processed"
+
 
 
 def verify_fb_token(token_sent):
