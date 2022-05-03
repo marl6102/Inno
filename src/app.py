@@ -1,10 +1,9 @@
 import random
-from _NLP import CoreNLP
 from flask import Flask, request
 from pymessenger.bot import Bot
 
 app = Flask(__name__)
-ACCESS_TOKEN = 'EAAGBE6P3er0BANk1ON8qJAdwWBBa0LiKHB092uephZB69r3hOuPtOfWJeZA7h7BVLMEKTmsnAegiuavPXP6G3Conr2xZCUIUF05SDLsRzwoSYhDNdJPK1ZBaDmWAZCwh7aKga8koMb7FPZCEwKyMEZB0eAEBWBrMwlhdI78yBMXkArynCvazzrW'
+ACCESS_TOKEN = 'EAAGjZCwCcxxgBAMVOZAT9BJm3wvy3ip5fmCTusDBZClATwlm7j8cXdyfghfnmP8qRv1dZBZAblqLo4ZCCBTI1VVS2ZCCaNZBua3jnGZBJMQeGAQSHUMecqrTDZAsjoEZA8iZBZCfuIoc9HInmC7qAjfFJ3l8pqJLLC2QHcWkK3snvdHgtf4gtSJSkBCqA'
 VERIFY_TOKEN = 'Inno2022'
 bot = Bot(ACCESS_TOKEN)
 
@@ -26,8 +25,8 @@ def receive_message():
                 recipient_id = message['sender']['id']
                 if message['message'].get('text'):
                     user_message = message['message'].get('text')
-                    reply = _NLP.undertandMessage()
-                    send_message(recipient_id, reply)
+                    #reply = _NLP.undertandMessage()
+                    send_message(recipient_id, get_message())
     return "Message Processed"
 
 
