@@ -1,10 +1,11 @@
 from flask import Flask, request
 from pymessenger.bot import Bot
 from pymessenger import Element, Button
+import pyodbc
 
 app = Flask(__name__)
 
-ACCESS_TOKEN = "EAAGjZCwCcxxgBAOXvgOkwL4FY9B1518QDXAtzJPv8Si7mJGtGFyDPJ6Bnb62XTlyeZAhgFebVHwzhOPYY8DuKF5SrB5zGvgeecGYmcsPdMOZBO8i0MqPYSvzgNqSETMSJclWtFZCvZAIQUx63IFzUvN4ezO5VAOu1AWfNG6AMUJfK3ltQDQFZA"
+ACCESS_TOKEN = "EAAGjZCwCcxxgBAJrPuObjYH3zWP4ZBf097ZBTYahHb4n0xc2Na5Pctsbk4HcnZB3kFykkYtKzLQhqyXuM9ZB9lVawXaGRgTWjxMukQ6MZAaAVM7Www4oJVGahnVTCVBCvRAytXyB3ZAZCEhq14pvG0vvmThtjjN3uaRkEWIKnoOEaEahZCMtJcauf"
 VERIFY_TOKEN = "Inno2022"
 bot = Bot(ACCESS_TOKEN)
 
@@ -27,38 +28,97 @@ def hello():
                     
                     if x['message'].get('text'):
                         message = x['message']['text']
+                        print(message)
 
-                        buttons = []
-                        button = Button(title='BSCS', type='postback', payload='BSCS')
-                        buttons.append(button)
-                        button = Button(title='BSIT', type='postback', payload='BSIT')
-                        buttons.append(button)
-                        button = Button(title='BSIS', type='postback', payload='BSIS')
-                        buttons.append(button)    
-                        text = 'Select topic'
-                        result = bot.send_button_message(recipient_id, text, buttons)
-
+                        main_menu(recipient_id)
                         
                 elif x.get('postback'):
                     payload = x['postback'].get('payload')
-                    '''print(payload)
-                    bot.send_text_message(recipient_id, payload)'''
-                    reply_responses(recipient_id)
+                    pay = x['postback'].get('title')
+                    print('===========')
+                    print('Payload: ' + pay)
+                    print('Len:')
+                    print(len(pay))
+                    print('===========')
+
+                    if len(pay) > 11:
+                        message = get_response(payload)
+                        bot.send_text_message(recipient_id, message)
+                        main_menu(recipient_id)
+
+                    else:
+                        menus = getMenu(payload)
+                        buttons = []
+                        for mns in menus:
+                            button = Button(title=mns, type='postback', payload=mns)
+                            buttons.append(button)
+                        print(menus)
+                        bot.send_button_message(recipient_id, 'Select topic', buttons)
                 else:
                     pass
         return "Success"
 
-def reply_responses(recipient_id):
+def main_menu(recipient_id):
+    keywords = getKeywords()
     buttons = []
-    button = Button(title='BSCS Instructors', type='postback', payload='BSCS Instructors')
-    buttons.append(button)
-    button = Button(title='BSIT Instructors', type='postback', payload='BSIT Instructors')
-    buttons.append(button)
-    button = Button(title='BSIS Instructors', type='postback', payload='BSIS Instructors')
-    buttons.append(button)    
-    text = 'Select topic'
-    result = bot.send_button_message(recipient_id, text, buttons)
+    for keys in keywords:
+        button = Button(title=keys, type='postback', payload=keys)
+        buttons.append(button)
 
+    bot.send_button_message(recipient_id, 'Select topic', buttons)
+
+def getKeywords():
+    #database details
+    server = 'localhost' 
+    database = 'INNO'
+
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server}; SERVER=' + server + '; DATABASE=' + database + '; Trusted_Connection=yes;')
+
+    cursor = cnxn.cursor()
+    cursor.execute('SELECT * FROM Keywords')
+    row = cursor.fetchall()
+    tags = []
+
+    for i in row:
+        data = i[1]
+        tags.append(data)
+
+    #print(tags)
+    return tags
+
+def getMenu(payload):
+    #database details
+    server = 'localhost' 
+    database = 'INNO'
+
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server}; SERVER=' + server + '; DATABASE=' + database + '; Trusted_Connection=yes;')
+
+    cursor = cnxn.cursor()
+    cnstring = "SELECT * FROM Responses WHERE Tag LIKE '" + payload + "%';"
+    cursor.execute(cnstring)
+    row = cursor.fetchall()
+    tags = []
+
+    for i in row:
+        data = i[1]
+        tags.append(data)
+
+    #print(tags)
+    return tags
+
+def get_response(question):
+    #database details
+    server = 'localhost' 
+    database = 'INNO'
+
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server}; SERVER=' + server + '; DATABASE=' + database + '; Trusted_Connection=yes;')
+
+    cursor = cnxn.cursor()
+    cnstring = "SELECT * FROM Responses WHERE Question LIKE '" + question + "%';"
+    cursor.execute(cnstring)
+    row = cursor.fetchall()
+    print(row[0][2])
+    return row[0][2]
 
 if __name__ == "__main__":
     app.run()
