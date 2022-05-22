@@ -1,9 +1,10 @@
 import random
 from flask import Flask, request
 from pymessenger.bot import Bot
+from pymessenger import Element, Button
 
 app = Flask(__name__)
-ACCESS_TOKEN = 'EAAGjZCwCcxxgBAMVOZAT9BJm3wvy3ip5fmCTusDBZClATwlm7j8cXdyfghfnmP8qRv1dZBZAblqLo4ZCCBTI1VVS2ZCCaNZBua3jnGZBJMQeGAQSHUMecqrTDZAsjoEZA8iZBZCfuIoc9HInmC7qAjfFJ3l8pqJLLC2QHcWkK3snvdHgtf4gtSJSkBCqA'
+ACCESS_TOKEN = 'EAAGjZCwCcxxgBAOXvgOkwL4FY9B1518QDXAtzJPv8Si7mJGtGFyDPJ6Bnb62XTlyeZAhgFebVHwzhOPYY8DuKF5SrB5zGvgeecGYmcsPdMOZBO8i0MqPYSvzgNqSETMSJclWtFZCvZAIQUx63IFzUvN4ezO5VAOu1AWfNG6AMUJfK3ltQDQFZA'
 VERIFY_TOKEN = 'Inno2022'
 bot = Bot(ACCESS_TOKEN)
 
@@ -25,11 +26,10 @@ def receive_message():
                 recipient_id = message['sender']['id']
                 if message['message'].get('text'):
                     user_message = message['message'].get('text')
+                    print(user_message)
                     #reply = _NLP.undertandMessage()
                     send_message(recipient_id, get_message())
     return "Message Processed"
-
-
 
 def verify_fb_token(token_sent):
     #take token sent by facebook and verify it matches the verify token you sent
@@ -37,7 +37,6 @@ def verify_fb_token(token_sent):
     if token_sent == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return 'Invalid verification token'
-
 
 #chooses a random message to send to the user
 def get_message():
@@ -48,7 +47,20 @@ def get_message():
 #uses PyMessenger to send response to user
 def send_message(recipient_id, response):
     #sends user the text message provided via input response parameter
-    bot.send_text_message(recipient_id, response)
+    print(response)
+
+    buttons = []
+    button = Button(title='BSCS', type='postback', payload='BSCS')
+    buttons.append(button)
+    button = Button(title='BSIT', type='postback', payload='BSIT')
+    buttons.append(button)
+    button = Button(title='BSIS', type='postback', payload='BSIS')
+    buttons.append(button)    
+    text = 'Select topic'
+    result = bot.send_button_message(recipient_id, text, buttons)
+    #bot.send_button_message(recipient_id, "message to send with button", url_button)
+    #bot.send_button_message(recipient_id, response, buttons)
+    #bot.send_text_message(recipient_id, response)
     return "success"
 
 if __name__ == "__main__":
